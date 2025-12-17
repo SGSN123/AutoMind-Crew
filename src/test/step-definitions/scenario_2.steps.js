@@ -1,58 +1,77 @@
-const { Given, When, Then } = require('@cucumber/cucumber');
-const { expect } = require('chai'); // Chai is used for assertions
+```javascript
+const { Given, When, Then, Before, After } = require('@cucumber/cucumber');
+const { chromium } = require('playwright');
 
-let usernameField, passwordField, signInButton; // These represent your login page elements
-let isAuthenticated = false; // To simulate successful authentication
-let currentPage = 'login'; // Initially, the user is on the login page
+let browser;
+let context;
+let page;
 
-// Given: The user is on the login page
-Given('the user is on the login page', function () {
-  // Normally, you'd navigate to the login page here using your test framework (e.g., Playwright, Selenium)
-  // Example with Playwright: await page.goto('https://yourapp.com/login');
-  console.log('User is on the login page');
-  // For now, we just set the page state
-  currentPage = 'login';
+Given('I launch Chrome browser', async function () {
+  browser = await chromium.launch({ channel: 'chrome', headless: false });
+  context = await browser.newContext();
+  page = await context.newPage();
 });
 
-// When: The user enters a valid username
-When('the user enters a valid username', function () {
-  usernameField = 'validUsername'; // Simulating entering a valid username
-  console.log('User enters username: ', usernameField);
+When('I navigate to Appian application', async function () {
+  await page.goto('https://appian.example.com');
 });
 
-// And: The user enters a valid password
-When('the user enters a valid password', function () {
-  passwordField = 'validPassword'; // Simulating entering a valid password
-  console.log('User enters password: ', passwordField);
+When('I login with valid credentials', async function () {
+  await page.fill('input[name="username"]', 'validUsername');
+  await page.fill('input[name="password"]', 'validPassword');
+  await page.click('button[type="submit"]');
+  await page.waitForLoadState('networkidle');
 });
 
-// And: The password field is masked
-When('the password field is masked', function () {
-  // Simulating the masking of the password field (usually done with a web element, e.g., type="password")
-  console.log('Password field is masked');
+Given('the user navigates to the login page', async function () {
+  await page.goto('https://appian.example.com/login');
 });
 
-// And: The user clicks on the Sign In button
-When('the user clicks on the Sign In button', function () {
-  // Simulate the action of clicking the Sign In button
-  // In a real test, you'd click the button with something like Playwright: await signInButton.click();
-  console.log('User clicks the Sign In button');
-  
-  // Simulating a successful login for the example
-  if (usernameField === 'validUsername' && passwordField === 'validPassword') {
-    isAuthenticated = true;
-    currentPage = 'home'; // Redirect to home page
-  }
+Then('the login page displays a Username field', async function () {
+  await page.waitForSelector('input[name="username"]', { state: 'visible' });
 });
 
-// Then: The user should be successfully authenticated
-Then('the user should be successfully authenticated', function () {
-  expect(isAuthenticated).to.be.true; // Assert that the user is authenticated
-  console.log('User is successfully authenticated');
+Then('the login page displays a Password field', async function () {
+  await page.waitForSelector('input[name="password"]', { state: 'visible' });
 });
 
-// And: The user should be redirected to the Home Dashboard
-Then('the user should be redirected to the Home Dashboard', function () {
-  expect(currentPage).to.equal('home'); // Assert that the user is on the Home page
-  console.log('User is redirected to the Home Dashboard');
+Then('the login page displays a Sign In button', async function () {
+  await page.waitForSelector('button[type="submit"]', { state: 'visible' });
 });
+
+When('the user enters a valid username in the Username field', async function () {
+  await page.fill('input[name="username"]', 'validUsername');
+});
+
+When('the user enters a valid password in the Password field', async function () {
+  await page.fill('input[name="password"]', 'validPassword');
+});
+
+Then('the Password field masks the entered password', async function () {
+  const type = await page.getAttribute('input[name="password"]', 'type');
+  if (type !== 'password') throw new Error('Password field is not masked');
+});
+
+Then('the Sign In button is clickable', async function () {
+  const isDisabled = await page.$eval('button[type="submit"]', (btn) => btn.disabled);
+  if (isDisabled) throw new Error('Sign In button is disabled');
+});
+
+When('the user clicks the Sign In button', async function () {
+  await page.click('button[type="submit"]');
+  await page.waitForLoadState('networkidle');
+});
+
+Then('the user is authenticated successfully', async function () {
+  const url = page.url();
+  if (!url.includes('/dashboard')) throw new Error('User not authenticated or not redirected properly');
+});
+
+Then('the user is redirected to the Home Dashboard', async function () {
+  await page.waitForSelector('text=Home Dashboard', { state: 'visible' });
+});
+
+After(async function () {
+  if (browser) await browser.close();
+});
+```
