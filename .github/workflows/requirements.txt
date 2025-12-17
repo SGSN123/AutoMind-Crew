@@ -1,3 +1,0 @@
-openpyxl
-PyGithub
-python-dotenv
