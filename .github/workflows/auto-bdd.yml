@@ -1,0 +1,42 @@
+name: Auto BDD Generation and Test
+
+on:
+  workflow_dispatch:   # manual trigger for now
+
+jobs:
+  generate-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Install Node dependencies
+        run: |
+          npm install
+          npx playwright install
+
+      - name: Generate BDD and Step Definitions
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python generate_bdd_and_steps.py
+
+      - name: Run Playwright Cucumber Tests
+        run: |
+          npx cucumber-js
