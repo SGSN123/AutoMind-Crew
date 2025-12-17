@@ -33,7 +33,7 @@ jobs:
       # 4️⃣ Install Python dependencies
       - name: Install dependencies
         working-directory: ./path-to-your-app
-       run: |
+        run: |
          pip install -r requirements.txt
 
       # 5️⃣ Install Node dependencies
