@@ -14,27 +14,33 @@ jobs:
 
       # 2️⃣ Setup Python
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       # 3️⃣ Setup Node.js
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
+      # 🔍 (Optional) Debug – verify files exist
+      - name: Debug workspace
+        run: |
+          pwd
+          ls -la
+
       # 4️⃣ Install Python dependencies
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install openpyxl requests python-dotenv PyGithub
+          pip install -r requirements.txt
 
       # 5️⃣ Install Node dependencies
       - name: Install Node dependencies
         run: |
           npm install
-          npx playwright install
+          npx playwright install --with-deps
 
       # 6️⃣ Run Python BDD generator
       - name: Generate BDD and Step Definitions
@@ -46,14 +52,20 @@ jobs:
         run: |
           python generate_bdd_and_steps.py
 
-      # 7️⃣ Commit generated files
+      # 7️⃣ Commit generated files (only if changed)
       - name: Commit generated files
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add src/test/resources/features src/test/step-definitions
-          git diff --cached --quiet || git commit -m "Auto-generated BDD scenarios"
-          git push
+
+          if ! git diff --cached --quiet; then
+            git commit -m "Auto-generated BDD scenarios"
+            git push
+          else
+            echo "No changes to commit"
+          fi
 
       # 8️⃣ Run Playwright Cucumber tests
       - name: Run Playwright Cucumber Tests
