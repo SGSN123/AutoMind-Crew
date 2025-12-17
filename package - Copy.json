@@ -1,0 +1,14 @@
+{
+  "name": "automind-crew",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "@playwright/test": "^1.43.0",
+    "@cucumber/cucumber": "^10.0.0",
+    "playwright": "^1.43.0"
+  },
+  "scripts": {
+    "test": "npx cucumber-js"
+  }
+}
+
