@@ -31,10 +31,10 @@ jobs:
           ls -la
 
       # 4️⃣ Install Python dependencies
-      - name: Install dependencies
-        working-directory: ./path-to-your-app
+      - name: Install Python dependencies
         run: |
-         pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       # 5️⃣ Install Node dependencies
       - name: Install Node dependencies
