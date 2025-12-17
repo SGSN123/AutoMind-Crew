@@ -13,7 +13,7 @@ Given('I launch Chrome browser', async function () {
 });
 
 When('I navigate to Appian application', async function () {
-  await page.goto('https://appian.example.com');
+  await page.goto('https://appian.application.url/');
 });
 
 When('I login with valid credentials', async function () {
@@ -24,37 +24,35 @@ When('I login with valid credentials', async function () {
 });
 
 Given('the user navigates to the login page', async function () {
-  await page.goto('https://appian.example.com/login');
+  await page.goto('https://appian.application.url/login');
 });
 
-Then('the login page displays a Username field', async function () {
-  await page.waitForSelector('input[name="username"]', { state: 'visible' });
+Then('the login page must display Username field', async function () {
+  const usernameField = await page.$('input[name="username"]');
+  if (!usernameField) throw new Error('Username field not found');
 });
 
-Then('the login page displays a Password field', async function () {
-  await page.waitForSelector('input[name="password"]', { state: 'visible' });
+Then('the login page must display Password field', async function () {
+  const passwordField = await page.$('input[name="password"]');
+  if (!passwordField) throw new Error('Password field not found');
 });
 
-Then('the login page displays a Sign In button', async function () {
-  await page.waitForSelector('button[type="submit"]', { state: 'visible' });
+Then('the login page must display Sign In button', async function () {
+  const signInButton = await page.$('button[type="submit"]');
+  if (!signInButton) throw new Error('Sign In button not found');
 });
 
-When('the user enters a valid username in the Username field', async function () {
+When('the user enters "validUsername" in the Username field', async function () {
   await page.fill('input[name="username"]', 'validUsername');
 });
 
-When('the user enters a valid password in the Password field', async function () {
+When('the user enters "validPassword" in the Password field', async function () {
   await page.fill('input[name="password"]', 'validPassword');
 });
 
-Then('the Password field masks the entered password', async function () {
+Then('the Password field must be masked', async function () {
   const type = await page.getAttribute('input[name="password"]', 'type');
   if (type !== 'password') throw new Error('Password field is not masked');
-});
-
-Then('the Sign In button is clickable', async function () {
-  const isDisabled = await page.$eval('button[type="submit"]', (btn) => btn.disabled);
-  if (isDisabled) throw new Error('Sign In button is disabled');
 });
 
 When('the user clicks the Sign In button', async function () {
@@ -62,16 +60,19 @@ When('the user clicks the Sign In button', async function () {
   await page.waitForLoadState('networkidle');
 });
 
-Then('the user is authenticated successfully', async function () {
-  const url = page.url();
-  if (!url.includes('/dashboard')) throw new Error('User not authenticated or not redirected properly');
+Then('the user must be successfully authenticated', async function () {
+  const content = await page.content();
+  if (!content.includes('Welcome') && !content.includes('Logout')) {
+    throw new Error('Authentication failed');
+  }
 });
 
 Then('the user is redirected to the Home Dashboard', async function () {
-  await page.waitForSelector('text=Home Dashboard', { state: 'visible' });
+  await page.waitForURL('**/home-dashboard');
+  if (!page.url().includes('/home-dashboard')) throw new Error('Not redirected to Home Dashboard');
 });
 
 After(async function () {
-  if (browser) await browser.close();
+  await browser?.close();
 });
 ```
