@@ -1,7 +1,7 @@
 name: Auto BDD Generation and Test
 
 on:
-  workflow_dispatch:   # manual trigger for now
+  workflow_dispatch:   # manual trigger
 
 jobs:
   generate-and-test:
@@ -19,6 +19,7 @@ jobs:
           python-version: '3.11'
 
       # 3️⃣ Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
@@ -45,7 +46,7 @@ jobs:
         run: |
           python generate_bdd_and_steps.py
 
-      # 7️⃣ Commit generated files (if any)
+      # 7️⃣ Commit generated files
       - name: Commit generated files
         run: |
           git config user.name "github-actions"
