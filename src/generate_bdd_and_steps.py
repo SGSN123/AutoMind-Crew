@@ -39,7 +39,7 @@ print("✅ Environment variables loaded")
 # Load Excel (must exist in repo root)
 # -------------------------------------------------
 BASE_DIR = os.path.dirname(__file__)
-EXCEL_PATH = os.path.join(BASE_DIR, "resources", "Jira.xlsx")
+EXCEL_PATH = os.path.join(BASE_DIR, "test","resources", "Jira.xlsx")
  
 wb = openpyxl.load_workbook(EXCEL_PATH)
 sheet = wb.active
@@ -190,4 +190,5 @@ for row in range(2, sheet.max_row + 1):
 wb.save("updated_acceptance_criteria.xlsx")
 print("✅ Excel updated")
 print("✅ Features & Steps pushed to GitHub")
+
 
