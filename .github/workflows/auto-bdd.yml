@@ -1,7 +1,7 @@
 name: Auto BDD Generation and Test
 
 on:
-  workflow_dispatch:   # Manual trigger
+  workflow_dispatch:
 
 jobs:
   generate-and-test:
@@ -12,7 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Debug repo structure (IMPORTANT)
+      # 2️⃣ Debug repository structure (IMPORTANT)
       - name: Debug repo structure
         run: |
           echo "ROOT FILES:"
@@ -36,11 +36,9 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install openpyxl
-          pip install PyGithub
-          pip install python-dotenv
+          pip install -r requirements.txt
 
-      # 6️⃣ Install Node dependencies (MAIN FIX)
+      # 6️⃣ Install Node dependencies (ROOT ONLY)
       - name: Install Node dependencies
         run: |
           pwd
@@ -48,7 +46,7 @@ jobs:
           npm install
           npx playwright install --with-deps
 
-      # 7️⃣ Run Python BDD generator
+      # 7️⃣ Generate BDD and Step Definitions
       - name: Generate BDD and Step Definitions
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -58,7 +56,7 @@ jobs:
         run: |
           python generate_bdd_and_steps.py
 
-      # 8️⃣ Commit generated files (only if changed)
+      # 8️⃣ Commit generated files
       - name: Commit generated files
         run: |
           git config user.name "github-actions[bot]"
@@ -73,7 +71,7 @@ jobs:
             echo "No changes to commit"
           fi
 
-      # 9️⃣ Run Playwright Cucumber tests
+      # 9️⃣ Run Playwright Cucumber Tests
       - name: Run Playwright Cucumber Tests
         run: |
           npx cucumber-js
