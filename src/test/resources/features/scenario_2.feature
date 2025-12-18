@@ -6,14 +6,14 @@ Background: Login to Appian
   When I navigate to Appian application
   And I login with valid credentials
 
-  Scenario: User can log in successfully with valid credentials
-    Given the user navigates to the login page
-    Then the login page must display Username field
-    And the login page must display Password field
-    And the login page must display Sign In button
-    When the user enters "validUsername" in the Username field
-    And the user enters "validPassword" in the Password field
-    Then the Password field must be masked
-    When the user clicks the Sign In button
-    Then the user must be successfully authenticated
+  Scenario: Successful login with valid credentials
+    Given the user is on the login page
+    Then the Username field is displayed
+    And the Password field is displayed
+    And the Password field input is masked
+    And the Sign In button is displayed
+    When the user enters a username in the Username field
+    And the user enters a password in the Password field
+    And the user clicks the Sign In button
+    Then the user is successfully authenticated
     And the user is redirected to the Home Dashboard
