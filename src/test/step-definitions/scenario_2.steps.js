@@ -1,10 +1,13 @@
-```javascript
 const { Given, When, Then, Before, After } = require('@cucumber/cucumber');
 const { chromium } = require('playwright');
 
 let browser;
 let context;
 let page;
+
+const URL = 'https://littlevillagecharityuk-test.appiancloud.com/';
+const USERNAME = 'William';
+const PASSWORD = 'LCM@1111';
 
 Given('I launch Chrome browser', async function () {
   browser = await chromium.launch({ channel: 'chrome', headless: false });
@@ -13,18 +16,18 @@ Given('I launch Chrome browser', async function () {
 });
 
 When('I navigate to Appian application', async function () {
-  await page.goto('https://appian.example.com');
+  await page.goto(URL);  // Navigate to the new URL
 });
 
 When('I login with valid credentials', async function () {
-  await page.fill('#username', 'validUser');
-  await page.fill('#password', 'validPassword');
+  await page.fill('#username', USERNAME);  // Use your username here
+  await page.fill('#password', PASSWORD);  // Use your password here
   await page.click('#signIn');
   await page.waitForLoadState('networkidle');
 });
 
 Given('the user is on the login page', async function () {
-  await page.goto('https://appian.example.com/login');
+  await page.goto(`${URL}login`);  // Navigate to the login page using the new URL
 });
 
 Then('the login page must display the Username field', async function () {
@@ -40,11 +43,11 @@ Then('the login page must display the Sign In button', async function () {
 });
 
 When('the user enters a valid username in the Username field', async function () {
-  await page.fill('#username', 'validUser');
+  await page.fill('#username', USERNAME);  // Use your username here
 });
 
 When('the user enters a valid password in the Password field', async function () {
-  await page.fill('#password', 'validPassword');
+  await page.fill('#password', PASSWORD);  // Use your password here
 });
 
 Then('the password field must be masked', async function () {
@@ -78,4 +81,3 @@ Then('the user must be redirected to the Home Dashboard', async function () {
 After(async function () {
   await browser.close();
 });
-```
