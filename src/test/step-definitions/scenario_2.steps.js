@@ -6,69 +6,69 @@ let browser;
 let context;
 let page;
 
-Given('I launch Chrome browser', async function () {
-  browser = await chromium.launch({ headless: false, channel: 'chrome' });
+Given('I launch Chrome browser', async function() {
+  browser = await chromium.launch({ channel: 'chrome', headless: false });
   context = await browser.newContext();
   page = await context.newPage();
+  this.page = page;
 });
 
-When('I navigate to Appian application', async function () {
-  await page.goto('https://appian.url'); // Replace with actual URL
+When('I navigate to Appian application', async function() {
+  await this.page.goto('https://appian.example.com');
 });
 
-When('I login with valid credentials', async function () {
-  await page.fill('input[name="username"]', 'validUser');
-  await page.fill('input[name="password"]', 'validPassword');
-  await page.click('button:has-text("Sign In")');
+When('I login with valid credentials', async function() {
+  await this.page.fill('input[name="username"]', 'validUser');
+  await this.page.fill('input[name="password"]', 'validPassword');
+  await this.page.click('button[type="submit"]');
 });
 
-Given('the user is on the login page', async function () {
-  await page.goto('https://appian.url/login'); // Replace with actual login page URL
+Given('the user is on the login page', async function() {
+  await this.page.goto('https://appian.example.com/login');
 });
 
-Then('the Username field is displayed', async function () {
-  const usernameField = await page.isVisible('input[name="username"]');
-  if (!usernameField) throw new Error('Username field not displayed');
+Then('the Username field is displayed', async function() {
+  const usernameVisible = await this.page.isVisible('input[name="username"]');
+  if (!usernameVisible) throw new Error('Username field is not visible');
 });
 
-Then('the Password field is displayed', async function () {
-  const passwordField = await page.isVisible('input[name="password"]');
-  if (!passwordField) throw new Error('Password field not displayed');
+Then('the Password field is displayed', async function() {
+  const passwordVisible = await this.page.isVisible('input[name="password"]');
+  if (!passwordVisible) throw new Error('Password field is not visible');
 });
 
-Then('the Password field input is masked', async function () {
-  const type = await page.getAttribute('input[name="password"]', 'type');
-  if (type !== 'password') throw new Error('Password field input not masked');
+Then('the Sign In button is displayed', async function() {
+  const signInVisible = await this.page.isVisible('button[type="submit"]');
+  if (!signInVisible) throw new Error('Sign In button is not visible');
 });
 
-Then('the Sign In button is displayed', async function () {
-  const signInButton = await page.isVisible('button:has-text("Sign In")');
-  if (!signInButton) throw new Error('Sign In button not displayed');
+When('the user enters {string} into the Username field', async function(username) {
+  await this.page.fill('input[name="username"]', username);
 });
 
-When('the user enters a username in the Username field', async function () {
-  await page.fill('input[name="username"]', 'testUser');
+When('the user enters {string} into the Password field', async function(password) {
+  await this.page.fill('input[name="password"]', password);
 });
 
-When('the user enters a password in the Password field', async function () {
-  await page.fill('input[name="password"]', 'testPassword');
+Then('the Password field must mask the entered text', async function() {
+  const passwordType = await this.page.getAttribute('input[name="password"]', 'type');
+  if (passwordType !== 'password') throw new Error('Password field is not masked');
 });
 
-When('the user clicks the Sign In button', async function () {
-  await page.click('button:has-text("Sign In")');
+When('the user clicks the Sign In button', async function() {
+  await this.page.click('button[type="submit"]');
 });
 
-Then('the user is successfully authenticated', async function () {
-  const userIsAuthenticated = await page.waitForSelector('text=Welcome', { timeout: 5000 }).then(() => true).catch(() => false);
-  if (!userIsAuthenticated) throw new Error('User not authenticated');
+Then('the user is successfully authenticated', async function() {
+  await this.page.waitForSelector('text=Welcome', { timeout: 5000 });
 });
 
-Then('the user is redirected to the Home Dashboard', async function () {
-  const url = page.url();
-  if (!url.includes('/home-dashboard')) throw new Error('User not redirected to Home Dashboard');
+Then('the user is redirected to the Home Dashboard', async function() {
+  const url = this.page.url();
+  if (!url.includes('/dashboard')) throw new Error('User is not redirected to Home Dashboard');
 });
 
-After(async function () {
+After(async function() {
   if (browser) await browser.close();
 });
 ```
