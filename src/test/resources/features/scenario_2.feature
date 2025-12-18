@@ -6,15 +6,17 @@ Background: Login to Appian
   When I navigate to Appian application
   And I login with valid credentials
 
-  Scenario: User can log in successfully with valid credentials
-    Given the user is on the login page in Chrome
-    Then the Username field is displayed
-    And the Password field is displayed
-    And the Password field is masked
-    And the Sign In button is displayed
-    When the user enters a username in the Username field
-    And the user enters a password in the Password field
-    Then the Sign In button is clickable
-    When the user clicks the Sign In button
-    Then the user is authenticated successfully
-    And the user is redirected to the Home Dashboard
+  Background:
+    Given the user navigates to the login page
+
+  Scenario: Successful login with valid credentials
+    Then the login page must display the "Username" field
+    And the login page must display the "Password" field
+    And the login page must display the "Sign In" button
+    When the user enters a username in the "Username" field
+    And the user enters a password in the "Password" field
+    Then the password field must be masked
+    And the "Sign In" button must be clickable
+    When the user clicks the "Sign In" button
+    Then the user should be authenticated successfully
+    And the user should be redirected to the Home Dashboard
