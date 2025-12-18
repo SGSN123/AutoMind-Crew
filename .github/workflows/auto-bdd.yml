@@ -40,8 +40,10 @@ jobs:
 
       # 5️⃣ Install Node dependencies
       - name: Install Node dependencies
-        working-directory: .
+        working-directory: ${{ github.workspace }}
         run: |
+          pwd
+          ls -la
           npm install
           npx playwright install --with-deps
 
